@@ -37,6 +37,7 @@ export default function ClientDetail() {
   const { client, dispatch } = useClient(id);
   const [activeTab, setActiveTab] = useState('overview');
   const [editing, setEditing] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [form, setForm] = useState({});
 
   if (!client) return (
@@ -45,6 +46,7 @@ export default function ClientDetail() {
 
   function startEdit() { setForm({ ...client, financials: { ...client.financials } }); setEditing(true); }
   function saveEdit() { dispatch({ type: 'UPDATE_CLIENT', payload: form }); setEditing(false); }
+  function handleDelete() { dispatch({ type: 'DELETE_CLIENT', payload: client.id }); navigate('/clients'); }
 
   const progress = getClientProgress(client);
   const msProgress = getMilestoneProgress(client);
@@ -91,7 +93,7 @@ export default function ClientDetail() {
             <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)' }}>Progress</div>
           </div>
           <button className="btn btn-secondary" onClick={startEdit}><Edit3 size={14} /> Edit</button>
-          <button className="btn btn-danger" onClick={() => { if (confirm('Delete this client?')) { dispatch({ type: 'DELETE_CLIENT', payload: client.id }); navigate('/clients'); } }}><Trash2 size={14} /></button>
+          <button className="btn btn-danger" onClick={() => setDeleting(true)}><Trash2 size={14} /></button>
         </div>
       </div>
 
@@ -142,6 +144,20 @@ export default function ClientDetail() {
             <div className="input-group"><label className="input-label">Total Agreed ($)</label><input className="input-field" type="number" value={form.financials?.totalAgreed||0} onChange={e => setForm({...form, financials:{...form.financials, totalAgreed: Number(e.target.value)}})} /></div>
             <div className="input-group"><label className="input-label">Revision Count</label><input className="input-field" type="number" value={form.revisionCount||0} onChange={e => setForm({...form, revisionCount: Number(e.target.value)})} /></div>
           </div>
+        </div>
+      </Modal>
+
+      <Modal isOpen={deleting} onClose={() => setDeleting(false)} title="Confirm Deletion" footer={
+        <><button className="btn btn-secondary" onClick={() => setDeleting(false)}>Cancel</button><button className="btn btn-danger" onClick={handleDelete}><Trash2 size={14} /> Delete Client</button></>
+      }>
+        <div style={{ textAlign: 'center', padding: '12px 0' }}>
+          <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+            <Trash2 size={24} />
+          </div>
+          <h3 style={{ fontSize: '1.25rem', marginBottom: 8 }}>Final Confirmation</h3>
+          <p style={{ color: 'var(--text-tertiary)', fontSize: '0.875rem', lineHeight: 1.5 }}>
+            Are you sure you want to delete <strong>{client.name}</strong>? This action is permanent and all project data will be lost from the cloud.
+          </p>
         </div>
       </Modal>
     </div>

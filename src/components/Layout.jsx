@@ -3,10 +3,11 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useClients } from '../context/AppContext';
 import CommandPalette from './CommandPalette';
 import { getOverdueTasks } from '../utils/helpers';
+import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard, Users, GitBranch, DollarSign, UserCheck,
   Settings, Plus, ChevronLeft, ChevronRight, Search, Command,
-  Sparkles, AlertTriangle
+  Sparkles, AlertTriangle, LogOut
 } from 'lucide-react';
 
 export default function Layout() {
@@ -14,6 +15,7 @@ export default function Layout() {
   const [cmdPalette, setCmdPalette] = useState(false);
   const navigate = useNavigate();
   const { clients } = useClients();
+  const { signOut, getDisplayName } = useAuth();
 
   const overdueTasks = getOverdueTasks(clients);
   const atRiskCount = clients.filter(c => c.health === 'at_risk' || c.health === 'delayed').length;
@@ -94,15 +96,33 @@ export default function Layout() {
         </button>
 
         <div className="sidebar-footer">
-          <div className="team-avatars">
-            <div className="avatar avatar-viraj avatar-sm" title="Viraj">VS</div>
-            <div className="avatar avatar-ishan avatar-sm" title="Ishan" style={{ marginLeft: -4 }}>IS</div>
+          <div className="team-avatars" onClick={signOut} style={{ cursor: 'pointer' }} title="Click to Logout">
+            {getDisplayName() === 'Viraj' ? (
+              <div className="avatar avatar-viraj avatar-sm">VS</div>
+            ) : getDisplayName() === 'Ishan' ? (
+              <div className="avatar avatar-ishan avatar-sm">IS</div>
+            ) : (
+              <div className="avatar avatar-sm" style={{ background: 'var(--bg-tertiary)' }}>{getDisplayName().substring(0, 2).toUpperCase()}</div>
+            )}
           </div>
           {!collapsed && (
-            <div className="team-info">
-              <strong>Ivy Devs</strong>
-              <span>● Online</span>
+            <div className="team-info" style={{ flex: 1 }}>
+              <strong>{getDisplayName()}</strong>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent)' }} />
+                Online
+              </span>
             </div>
+          )}
+          {!collapsed && (
+            <button 
+              onClick={signOut}
+              className="btn-ghost btn-icon" 
+              title="Logout"
+              style={{ padding: 4, color: 'var(--text-muted)' }}
+            >
+              <LogOut size={14} />
+            </button>
           )}
         </div>
       </aside>
