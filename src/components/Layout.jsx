@@ -12,6 +12,7 @@ import {
 
 export default function Layout() {
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [cmdPalette, setCmdPalette] = useState(false);
   const navigate = useNavigate();
   const { clients } = useClients();
@@ -31,6 +32,11 @@ export default function Layout() {
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
+  // Close mobile menu on navigate
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [window.location.pathname]);
+
   const navItems = [
     { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/clients', icon: Users, label: 'Clients' },
@@ -42,7 +48,20 @@ export default function Layout() {
 
   return (
     <div className="app-layout">
-      <aside className={`sidebar ${collapsed ? 'collapsed' : ''}`} style={{ position: 'relative' }}>
+      {/* Mobile Toggle Button */}
+      <button className="mobile-menu-toggle md-hide" onClick={() => setMobileOpen(!mobileOpen)}>
+        <Command size={20} />
+      </button>
+
+      {/* Sidebar Backdrop for mobile */}
+      {mobileOpen && (
+        <div 
+          onClick={() => setMobileOpen(false)}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', zBY: 45 }} 
+        />
+      )}
+
+      <aside className={`sidebar ${collapsed ? 'collapsed' : ''} ${mobileOpen ? 'mobile-open' : ''}`} style={{ position: 'relative' }}>
         <button className="sidebar-collapse-btn" onClick={() => setCollapsed(!collapsed)}>
           {collapsed ? <ChevronRight size={10} /> : <ChevronLeft size={10} />}
         </button>
@@ -58,21 +77,19 @@ export default function Layout() {
         </div>
 
         {/* Search shortcut */}
-        {!collapsed && (
-          <div style={{ padding: '10px 8px 4px' }}>
-            <button onClick={() => setCmdPalette(true)}
-              style={{
-                width: '100%', padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 8,
-                background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)',
-                borderRadius: 'var(--radius-sm)', cursor: 'pointer', color: 'var(--text-muted)',
-                fontSize: '0.75rem', fontFamily: 'inherit', transition: 'all var(--transition-fast)',
-              }}>
-              <Search size={13} />
-              <span style={{ flex: 1, textAlign: 'left' }}>Search…</span>
-              <kbd style={{ fontSize: '0.5625rem', padding: '2px 5px', background: 'rgba(255,255,255,0.06)', borderRadius: 3 }}>⌘K</kbd>
-            </button>
-          </div>
-        )}
+        <div className={collapsed ? 'hide' : ''} style={{ padding: '10px 8px 4px' }}>
+          <button onClick={() => setCmdPalette(true)}
+            style={{
+              width: '100%', padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 8,
+              background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-sm)', cursor: 'pointer', color: 'var(--text-muted)',
+              fontSize: '0.75rem', fontFamily: 'inherit', transition: 'all var(--transition-fast)',
+            }}>
+            <Search size={13} />
+            <span style={{ flex: 1, textAlign: 'left' }}>Search…</span>
+            <kbd className="md-hide" style={{ fontSize: '0.5625rem', padding: '2px 5px', background: 'rgba(255,255,255,0.06)', borderRadius: 3 }}>⌘K</kbd>
+          </button>
+        </div>
 
         <nav className="sidebar-nav">
           <div className="sidebar-nav-section">Main</div>
@@ -84,7 +101,7 @@ export default function Layout() {
             </NavLink>
           ))}
 
-          {!collapsed && atRiskCount > 0 && (
+          {(!collapsed || mobileOpen) && atRiskCount > 0 && (
             <div style={{ margin: '12px 8px', padding: '10px 12px', background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.1)', borderRadius: 'var(--radius-sm)', display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.6875rem', color: 'var(--danger)' }}>
               <AlertTriangle size={14} />
               <span><strong>{atRiskCount}</strong> project{atRiskCount > 1 ? 's' : ''} at risk</span>
@@ -107,7 +124,7 @@ export default function Layout() {
               <div className="avatar avatar-sm" style={{ background: 'var(--bg-tertiary)' }}>{getDisplayName().substring(0, 2).toUpperCase()}</div>
             )}
           </div>
-          {!collapsed && (
+          {(!collapsed || mobileOpen) && (
             <div className="team-info" style={{ flex: 1 }}>
               <strong>{getDisplayName()}</strong>
               <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -116,7 +133,7 @@ export default function Layout() {
               </span>
             </div>
           )}
-          {!collapsed && (
+          {(!collapsed || mobileOpen) && (
             <button 
               onClick={signOut}
               className="btn-ghost btn-icon" 

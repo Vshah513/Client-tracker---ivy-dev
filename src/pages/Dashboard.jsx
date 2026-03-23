@@ -36,9 +36,9 @@ export default function Dashboard() {
         <StatCard label="PIPELINE ASSETS" value={formatCurrency(fin.pipeline)} color="var(--accent)" />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 380px', gap: 48 }}>
+      <div className="dashboard-main-grid">
         {/* Left Column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
           {/* Intelligence Board */}
           <TeamBoard />
 
@@ -46,15 +46,15 @@ export default function Dashboard() {
           <div>
             <div className="flex-between" style={{ marginBottom: 24, paddingBottom: 12, borderBottom: '1px solid var(--border)' }}>
               <span className="uppercase-label">STRATEGIC PORTFOLIO</span>
-              <Link to="/clients" style={{ fontSize: '0.625rem', fontWeight: 800, letterSpacing: '0.1em', color: 'var(--accent)' }}>FULL REPERPOIRE →</Link>
+              <Link to="/clients" style={{ fontSize: '0.625rem', fontWeight: 800, letterSpacing: '0.1em', color: 'var(--accent)' }}>FULL REPERTOIRE →</Link>
             </div>
             
             {activeClients.length > 0 ? (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 1 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 1 }}>
                 {activeClients.map(c => {
                   const progress = getClientProgress(c);
                   return (
-                    <div key={c.id} className="glass-card-static" style={{ padding: 32, cursor: 'pointer', border: '1px solid var(--border)' }} onClick={() => navigate(`/clients/${c.id}`)}>
+                    <div key={c.id} className="glass-card-static" style={{ padding: 24, cursor: 'pointer', border: '1px solid var(--border)' }} onClick={() => navigate(`/clients/${c.id}`)}>
                       <div className="flex-between" style={{ marginBottom: 24 }}>
                         <div style={{ fontWeight: 700, fontSize: '0.75rem', letterSpacing: '0.05em', color: '#fff', textTransform: 'uppercase' }}>{c.name}</div>
                         <span style={{ fontSize: '0.5625rem', fontWeight: 800, color: 'var(--accent)', letterSpacing: '0.1em' }}>{c.health === 'nominal' ? 'NOMINAL' : 'AT RISK'}</span>
@@ -64,7 +64,7 @@ export default function Dashboard() {
                       </div>
                       <div className="flex-between">
                          <span style={{ fontSize: '0.5625rem', color: 'var(--text-muted)', fontWeight: 700 }}>COMPLETION: {progress}%</span>
-                         <span style={{ fontSize: '0.5625rem', color: 'var(--accent)', fontWeight: 700 }}>VERIFIED</span>
+                         <span className="md-hide" style={{ fontSize: '0.5625rem', color: 'var(--accent)', fontWeight: 700 }}>VERIFIED</span>
                       </div>
                     </div>
                   );
@@ -77,7 +77,7 @@ export default function Dashboard() {
         </div>
 
         {/* Right Column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
           {/* Status Alerts */}
           {overdueTasks.length > 0 && (
             <div style={{ border: '1px solid var(--border)', padding: 32 }}>

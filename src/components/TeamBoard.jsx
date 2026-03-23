@@ -93,7 +93,7 @@ export default function TeamBoard() {
         </div>
       </div>
 
-      <div style={{ 
+      <div className="intelligence-board-grid" style={{ 
         flex: 1, 
         overflowY: 'auto', 
         display: 'grid', 
@@ -101,8 +101,7 @@ export default function TeamBoard() {
         gap: 1,
         background: 'var(--border)',
         padding: 1,
-        marginTop: 20,
-        minHeight: 240
+        marginTop: 20
       }}>
         {notes.length === 0 && (
           <div style={{ 
