@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard, Users, GitBranch, DollarSign, UserCheck,
   Settings, Plus, ChevronLeft, ChevronRight, Search, Command,
-  Zap, AlertTriangle, LogOut
+  Zap, AlertTriangle, LogOut, Menu
 } from 'lucide-react';
 
 export default function Layout() {
@@ -48,10 +48,16 @@ export default function Layout() {
 
   return (
     <div className="app-layout">
-      {/* Mobile Toggle Button */}
-      <button className="mobile-menu-toggle md-hide" onClick={() => setMobileOpen(!mobileOpen)}>
-        <Command size={20} />
-      </button>
+      {/* Mobile Top Navigation Bar */}
+      <header className="mobile-topbar lg-hide">
+        <div className="mobile-topbar-brand">
+          <div className="mobile-topbar-icon"><Zap size={14} strokeWidth={3} /></div>
+          <span>IVY DEVS OS</span>
+        </div>
+        <button className="mobile-topbar-toggle" onClick={() => setMobileOpen(true)}>
+          <Menu size={20} />
+        </button>
+      </header>
 
       {/* Sidebar Backdrop for mobile */}
       {mobileOpen && (
