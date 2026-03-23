@@ -57,11 +57,11 @@ export default function Layout() {
       {mobileOpen && (
         <div 
           onClick={() => setMobileOpen(false)}
-          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', zBY: 45 }} 
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', zIndex: 45 }} 
         />
       )}
 
-      <aside className={`sidebar ${collapsed ? 'collapsed' : ''} ${mobileOpen ? 'mobile-open' : ''}`} style={{ position: 'relative' }}>
+      <aside className={`sidebar ${collapsed ? 'collapsed' : ''} ${mobileOpen ? 'mobile-open' : ''}`}>
         <button className="sidebar-collapse-btn" onClick={() => setCollapsed(!collapsed)}>
           {collapsed ? <ChevronRight size={10} /> : <ChevronLeft size={10} />}
         </button>
