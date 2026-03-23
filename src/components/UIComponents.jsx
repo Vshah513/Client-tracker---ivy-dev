@@ -2,14 +2,14 @@ import { useEffect, useRef } from 'react';
 import { CLIENT_STATUSES, HEALTH_STATUSES, PRIORITY_OPTIONS, TEAM_MEMBERS } from '../data/schema';
 
 // ─── Stat Card ───
-export function StatCard({ icon: Icon, label, value, prefix = '', color, delay = 0 }) {
+export function StatCard({ icon: Icon, label, value, prefix = '', color }) {
   return (
-    <div className={`stat-card animate-slide-up stagger-${delay + 1}`}>
+    <div className="stat-card animate-fade-in">
       <div className="stat-card-header">
         <span className="stat-card-label">{label}</span>
-        {Icon && <div className="stat-card-icon" style={{ background: `${color}15`, color }}><Icon size={18} /></div>}
+        {Icon && <div className="stat-card-icon" style={{ color }}><Icon size={14} /></div>}
       </div>
-      <div className="stat-card-value" style={{ color }}>
+      <div className="stat-card-value">
         {prefix}{typeof value === 'number' ? value.toLocaleString() : value}
       </div>
     </div>

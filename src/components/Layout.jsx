@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard, Users, GitBranch, DollarSign, UserCheck,
   Settings, Plus, ChevronLeft, ChevronRight, Search, Command,
-  Sparkles, AlertTriangle, LogOut
+  Zap, AlertTriangle, LogOut
 } from 'lucide-react';
 
 export default function Layout() {
@@ -44,14 +44,16 @@ export default function Layout() {
     <div className="app-layout">
       <aside className={`sidebar ${collapsed ? 'collapsed' : ''}`} style={{ position: 'relative' }}>
         <button className="sidebar-collapse-btn" onClick={() => setCollapsed(!collapsed)}>
-          {collapsed ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}
+          {collapsed ? <ChevronRight size={10} /> : <ChevronLeft size={10} />}
         </button>
 
         <div className="sidebar-brand">
-          <div className="sidebar-brand-icon"><Sparkles size={18} color="white" /></div>
+          <div className="sidebar-brand-icon">
+            <Zap size={16} strokeWidth={3} />
+          </div>
           <div className="sidebar-brand-text">
             <h2>IVY DEVS</h2>
-            <span>Operating System</span>
+            <span>OPERATING SYSTEM</span>
           </div>
         </div>
 

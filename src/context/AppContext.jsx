@@ -202,20 +202,8 @@ export function AppProvider({ children }) {
         }));
         dispatch({ type: 'SET_CLIENTS', payload: clients });
       } else if (data && data.length === 0) {
-        // If first time user, upload sample data
-        const initialClients = sampleClients.map(c => ({
-          user_id: user.id,
-          name: c.name,
-          data: c
-        }));
-        const { data: inserted, error: insertError } = await supabase
-          .from('clients')
-          .insert(initialClients)
-          .select();
-        
-        if (!insertError && inserted) {
-          dispatch({ type: 'SET_CLIENTS', payload: inserted.map(r => ({ ...r.data, id: r.id })) });
-        }
+        // If no clients found, just set an empty list
+        dispatch({ type: 'SET_CLIENTS', payload: [] });
       }
       setLoading(false);
     }
@@ -247,7 +235,9 @@ export function AppProvider({ children }) {
       });
     } else if (type === 'DELETE_CLIENT') {
       await supabase.from('clients').delete().eq('id', p);
-    } else if (p && p.clientId || p.id) {
+    } else if (type === 'RESET_DATA') {
+      await supabase.from('clients').delete().eq('user_id', user.id);
+    } else if (p && (p.clientId || p.id)) {
        // All other actions update a specific client
        const clientId = p.clientId || p.id;
        // We need the full updated client object. 
