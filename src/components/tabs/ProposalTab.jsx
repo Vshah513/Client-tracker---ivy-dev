@@ -1,10 +1,40 @@
+import { useState } from 'react';
 import { PIPELINE_STAGES } from '../../data/schema';
 import { formatCurrency, formatDate } from '../../utils/helpers';
-import { FileText, ExternalLink, DollarSign, Calendar, Clock, CheckCircle2, Send } from 'lucide-react';
+import { FileText, ExternalLink, DollarSign, Calendar, Clock, CheckCircle2, Send, UploadCloud, Loader2 } from 'lucide-react';
+import { supabase } from '../../utils/supabase';
 
 export default function ProposalTab({ client, dispatch }) {
+  const [uploading, setUploading] = useState(false);
   const p = client.proposal || {};
   function updateP(updates) { dispatch({ type: 'UPDATE_PROPOSAL', payload: { clientId: client.id, proposal: updates } }); }
+
+  async function handleFileUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    setUploading(true);
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${client.id}-${Date.now()}.${fileExt}`;
+    
+    // Upload to Supabase Storage 'proposals' bucket
+    const { error: uploadError } = await supabase.storage
+      .from('proposals')
+      .upload(fileName, file);
+
+    if (uploadError) {
+      alert(`Upload failed: ${uploadError.message}\n\nPlease ensure a public Storage bucket named "proposals" exists in your Supabase dashboard and accepts inserts.`);
+      setUploading(false);
+      return;
+    }
+
+    // Get public URL
+    const { data } = supabase.storage.from('proposals').getPublicUrl(fileName);
+    if (data && data.publicUrl) {
+      updateP({ url: data.publicUrl });
+    }
+    setUploading(false);
+  }
 
   const STEPS = [
     { value: 'none', label: 'Not Started', icon: Clock },
@@ -57,6 +87,19 @@ export default function ProposalTab({ client, dispatch }) {
               <div style={{ display: 'flex', gap: 8 }}>
                 <input className="input-field" value={p.url || ''} onChange={e => updateP({ url: e.target.value })} placeholder="https://..." style={{ flex: 1 }} />
                 {p.url && <a href={p.url} target="_blank" rel="noopener noreferrer" className="btn btn-secondary btn-sm"><ExternalLink size={12} /> Open</a>}
+              </div>
+              <div style={{ marginTop: 8 }}>
+                <input type="file" id="proposal-upload" accept="application/pdf" style={{ display: 'none' }} onChange={handleFileUpload} />
+                <label 
+                  htmlFor="proposal-upload" 
+                  className="btn btn-secondary btn-sm" 
+                  style={{ width: 'fit-content', cursor: uploading ? 'not-allowed' : 'pointer', pointerEvents: uploading ? 'none' : 'auto' }}
+                >
+                  {uploading ? (
+                    <div style={{ width: 14, height: 14, border: '2px solid var(--border)', borderTopColor: 'var(--accent)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+                  ) : <UploadCloud size={14} />}
+                  {uploading ? 'Uploading...' : 'Upload PDF'}
+                </label>
               </div>
             </div>
             <div className="input-group"><label className="input-label">Notes</label>
