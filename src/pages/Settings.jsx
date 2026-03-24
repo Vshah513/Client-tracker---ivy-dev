@@ -7,6 +7,7 @@ export default function Settings() {
   const { dispatch, state } = useApp();
   const navigate = useNavigate();
   const [showConfirm, setShowConfirm] = useState(false);
+  const [confirmCode, setConfirmCode] = useState('');
 
   function exportData() {
     const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
@@ -79,12 +80,39 @@ export default function Settings() {
                 <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)' }}>Delete all clients, tasks, and settings</div>
               </div>
               {showConfirm ? (
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <button className="btn btn-secondary btn-sm" onClick={() => setShowConfirm(false)}>Cancel</button>
-                  <button className="btn btn-danger btn-sm" onClick={resetData}>Confirm Reset</button>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'flex-end' }}>
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: 8, 
+                    background: 'rgba(239, 68, 68, 0.08)', 
+                    padding: '8px 12px', 
+                    borderRadius: 8, 
+                    color: 'var(--danger)', 
+                    fontSize: '0.75rem',
+                    border: '1px solid rgba(239, 68, 68, 0.2)'
+                  }}>
+                    <AlertTriangle size={14} />
+                    <span>DANGER: This will wipe all cloud data. Enter <strong>123456</strong>:</span>
+                  </div>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <input 
+                      type="password" 
+                      className="input-field" 
+                      style={{ width: 100, padding: '4px 12px', fontSize: '0.8125rem', height: 32 }} 
+                      placeholder="••••••" 
+                      value={confirmCode}
+                      onChange={e => setConfirmCode(e.target.value)}
+                      autoFocus
+                    />
+                    <button className="btn btn-secondary btn-sm" onClick={() => { setShowConfirm(false); setConfirmCode(''); }}>Cancel</button>
+                    <button className="btn btn-danger btn-sm" onClick={resetData} disabled={confirmCode !== '123456'}>
+                      Confirm Reset
+                    </button>
+                  </div>
                 </div>
               ) : (
-                <button className="btn btn-danger" onClick={() => setShowConfirm(true)}><Trash2 size={14} /> Reset</button>
+                <button className="btn btn-danger" onClick={() => setShowConfirm(true)}><Trash2 size={14} /> Reset All</button>
               )}
             </div>
           </div>
