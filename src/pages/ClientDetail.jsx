@@ -59,7 +59,7 @@ export default function ClientDetail() {
     tasks: <TasksTab client={client} dispatch={dispatch} />,
     deliverables: <DeliverablesTab client={client} dispatch={dispatch} />,
     financials: <FinancialsTab client={client} dispatch={dispatch} pending={pending} />,
-    proposal: <ProposalTab client={client} dispatch={dispatch} />,
+    proposal: <ProposalTab client={client} dispatch={dispatch} syncClient={syncClient} />,
     assets: <AssetsTab client={client} dispatch={dispatch} />,
     feedback: <FeedbackTab client={client} dispatch={dispatch} />,
     notes: <NotesTab client={client} dispatch={dispatch} />,

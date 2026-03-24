@@ -1,13 +1,27 @@
 import { useState } from 'react';
 import { PIPELINE_STAGES } from '../../data/schema';
 import { formatCurrency, formatDate } from '../../utils/helpers';
-import { FileText, ExternalLink, DollarSign, Calendar, Clock, CheckCircle2, Send, UploadCloud, Loader2 } from 'lucide-react';
+import { FileText, ExternalLink, DollarSign, Calendar, Clock, CheckCircle2, Send, UploadCloud, Loader2, Save } from 'lucide-react';
 import { supabase } from '../../utils/supabase';
 
-export default function ProposalTab({ client, dispatch }) {
+export default function ProposalTab({ client, dispatch, syncClient }) {
   const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const p = client.proposal || {};
   function updateP(updates) { dispatch({ type: 'UPDATE_PROPOSAL', payload: { clientId: client.id, proposal: updates } }); }
+
+  async function handleSave() {
+    setSaving(true);
+    try {
+      if (syncClient) {
+        await syncClient(client);
+      }
+    } catch (err) {
+      console.error('Save failed:', err);
+    } finally {
+      setTimeout(() => setSaving(false), 500);
+    }
+  }
 
   async function handleFileUpload(e) {
     const file = e.target.files[0];
@@ -31,7 +45,15 @@ export default function ProposalTab({ client, dispatch }) {
     // Get public URL
     const { data } = supabase.storage.from('proposals').getPublicUrl(fileName);
     if (data && data.publicUrl) {
+      const updatedP = { ...p, url: data.publicUrl };
       updateP({ url: data.publicUrl });
+      
+      // Auto-save to cloud immediately after upload
+      if (syncClient) {
+        setSaving(true);
+        await syncClient({ ...client, proposal: updatedP });
+        setSaving(false);
+      }
     }
     setUploading(false);
   }
@@ -67,7 +89,18 @@ export default function ProposalTab({ client, dispatch }) {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
         {/* Details */}
         <div className="glass-card-static" style={{ padding: 20 }}>
-          <h4 style={{ fontSize: '0.8125rem', fontWeight: 700, marginBottom: 14 }}>Proposal Details</h4>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+            <h4 style={{ fontSize: '0.8125rem', fontWeight: 700, margin: 0 }}>Proposal Details</h4>
+            <button 
+              className="btn btn-primary btn-sm" 
+              onClick={handleSave} 
+              disabled={saving}
+              style={{ padding: '4px 10px', fontSize: '0.75rem' }}
+            >
+              {saving ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
+              {saving ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             <div className="form-row">
               <div className="input-group"><label className="input-label">Version</label>

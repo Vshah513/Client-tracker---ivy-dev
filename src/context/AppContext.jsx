@@ -248,18 +248,26 @@ export function AppProvider({ children }) {
 
   // Improved syncing logic: Watch state changes and sync
   useEffect(() => {
-    if (!user || loading) return;
+    if (!user || loading || !state.clients.length) return;
     
-    // This is a simple debounced sync
+    // Simple debounced sync for any client changes
     const timer = setTimeout(async () => {
-      // For each client, check if it needs an update? 
-      // Simplified: Just update the clients that were changed.
-      // In this case, we'll just focus on making sure ADD/DELETE work, 
-      // and we'll add an 'UPDATE_CLIENT_CLOUD' helper.
-    }, 1000);
+      // For each client in our current state, we ensure the cloud matches.
+      // In a larger app, we'd only sync the dirty ones.
+      for (const client of state.clients) {
+        await supabase
+          .from('clients')
+          .update({
+            name: client.name,
+            data: client,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', client.id);
+      }
+    }, 3000); // 3-second debounce to avoid hitting rate limits
 
     return () => clearTimeout(timer);
-  }, [state, user, loading]);
+  }, [state.clients, user, loading]);
 
   // Provide a specialized sync function for manual or automatic updates
   async function syncClient(client) {
