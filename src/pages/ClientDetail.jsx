@@ -34,7 +34,7 @@ const TABS = [
 export default function ClientDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { client, dispatch } = useClient(id);
+  const { client, dispatch, syncClient } = useClient(id);
   const [activeTab, setActiveTab] = useState('overview');
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
